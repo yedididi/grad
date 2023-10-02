@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <ctype.h>
  
-unsigned short csum(unsigned short *ptr,int nbytes)
+unsigned short csum(unsigned short *ptr, int nbytes)
 {
     register long sum;
     unsigned short oddbyte;
