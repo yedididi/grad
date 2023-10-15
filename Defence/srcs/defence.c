@@ -32,7 +32,8 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	static int count = 1;                   /* packet counter */
 
 	/* get the time of first packet */
-	if (count == 1) {
+	if (count == 1) 
+	{
 		time(&table_round);
 	}
 
@@ -49,7 +50,8 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 
 	/* if 1 minutes pass from (current packet time - first packet time) and ip_can_drop == 0 
 		flush the TCPIP_REJECTED and set ip_can_drop 1*/
-	if ( (header->ts.tv_sec - table_round) >= 60 && !ip_can_drop ) {
+	if ( (header->ts.tv_sec - table_round) >= 60 && !ip_can_drop ) 
+	{
 		system("iptables -F TCPIP_REJECTED");
 		ip_can_drop = 1;
 	}
@@ -60,7 +62,8 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	/* define/compute ip header offset */
 	ip = (struct ip_header*)(packet + SIZE_ETHERNET);
 	size_ip = IP_HL(ip)*4;
-	if (size_ip < 20) {
+	if (size_ip < 20) 
+	{
 		printf("   * Invalid IP header length: %u bytes\n", size_ip);
 		return;
 	}
@@ -74,12 +77,13 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	strcpy(ipsrc_tmp, inet_ntoa(ip->ip_src));
 	char* token = strtok(ipsrc_tmp, ".");
 	u_char c = 0;
-	while (token) {
+	while (token) 
+	{
 		/* if last octet is reached*/
-		if (c == 3) {
+		if (c == 3) 
+		{
 			/* index of entry array is host IP number (hash with host IP)*/
 			u_char index = atoi(token);
-	
 			ip_update (ip_list, index, inet_ntoa(ip->ip_src), header->ts.tv_sec, header->ts.tv_usec, ip_can_drop);
 		}
 		token = strtok(NULL, ".");
@@ -97,8 +101,9 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	
 	/* define/compute tcp header offset */
 	tcp = (struct tcp_header*)(packet + SIZE_ETHERNET + size_ip);
-	size_tcp = TH_OFF(tcp)*4;
-	if (size_tcp < 20) {
+	size_tcp = TH_OFF(tcp) * 4;
+	if (size_tcp < 20) 
+	{
 		printf("   * Invalid TCP header length: %u bytes\n", size_tcp);
 		return;
 	}
@@ -108,13 +113,11 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	//printf("   TCP Flag: %d\n", ntohs(tcp->th_flags));
 	//printf("   sequence: %d\n", ntohs(tcp->th_seq));
 	//printf("   ack no: %d\n", ntohs(tcp->th_ack));
-
-	return;
+	return ;
 }
 
 int main(int argc, char **argv) 
 {
-
 	/* flush the INPUT chain to prevent duplicate entries*/
 	system("iptables -F INPUT");
 
@@ -133,8 +136,6 @@ int main(int argc, char **argv)
 	system("iptables -F TCPIP_REJECTED");
 	system("iptables -F TCPIP_DROPPED");
 
-
-
 	char *dev = NULL;			/* capture device name */
 	char errbuf[PCAP_ERRBUF_SIZE];		/* error buffer */
 	pcap_t *handle;				/* packet capture handle */
@@ -149,16 +150,17 @@ int main(int argc, char **argv)
 
 	print_app_banner();
 
-
 	/* find a capture device */
 	dev = pcap_lookupdev(errbuf);
-	if (dev == NULL) {
+	if (dev == NULL) 
+	{
 		fprintf(stderr, "Couldn't find default device: %s\n", errbuf);
 		exit(EXIT_FAILURE);
 	}
 	
 	/* get network number and mask associated with capture device */
-	if (pcap_lookupnet(dev, &net, &mask, errbuf) == -1) {
+	if (pcap_lookupnet(dev, &net, &mask, errbuf) == -1) 
+	{
 		fprintf(stderr, "Couldn't get netmask for device %s: %s\n", dev, errbuf);
 		net = 0;
 		mask = 0;
@@ -171,25 +173,29 @@ int main(int argc, char **argv)
 
 	/* open capture device */
 	handle = pcap_open_live(dev, SNAP_LEN, 1, 1000, errbuf);
-	if (handle == NULL) {
+	if (handle == NULL) 
+	{
 		fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
 		exit(EXIT_FAILURE);
 	}
 
 	/* make sure we're capturing on an Ethernet device */
-	if (pcap_datalink(handle) != DLT_EN10MB) {
+	if (pcap_datalink(handle) != DLT_EN10MB) 
+	{
 		fprintf(stderr, "%s is not an Ethernet\n", dev);
 		exit(EXIT_FAILURE);
 	}
 
 	/* compile the filter expression */
-	if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1) {
+	if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1) 
+	{
 		fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
 		exit(EXIT_FAILURE);
 	}
 
 	/* apply the compiled filter */
-	if (pcap_setfilter(handle, &fp) == -1) {
+	if (pcap_setfilter(handle, &fp) == -1) 
+	{
 		fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
 		exit(EXIT_FAILURE);
 	}
