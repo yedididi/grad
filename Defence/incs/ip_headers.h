@@ -1,9 +1,7 @@
-//
-// Created by Boran Yildirim on 13/07/2017.
-//
 
-#ifndef VLAN_HOPPING_IP_HEADERS_H
-#define VLAN_HOPPING_IP_HEADERS_H
+
+#ifndef IP_HEADERS_H
+#define IP_HEADERS_H
 
 #include <stdlib.h>
 #include <netinet/in.h>
@@ -99,4 +97,4 @@ struct icmp_header {
     u_short icmph_seqnum;
 } __attribute__((__packed__)); /* total ICMP header length: 8 bytes (= 64 bits) */
 
-#endif //VLAN_HOPPING_IP_HEADERS_H
+#endif //IP_HEADERS_H

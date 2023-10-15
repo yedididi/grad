@@ -1,17 +1,36 @@
-#include <stdlib.h>
-#include <sys/types.h>
-#include <stdint.h>
+#ifndef IP_CONTAINER_H
+#define IP_CONTAINER_H
 
+#include <stdint.h>
+#include <pcap.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <time.h>
+
+/*ip container structure definition*/
+struct IP_entry ** ip_list;
+
+/* table ronud for counting 1 minute for flushing the TCPIP_REJECTED chain*/
+static time_t table_round;
 
 /* seconds and microseconds of the entry*/
-struct IP_timestamp {
+struct IP_timestamp 
+{
 	long int sec;
 	long int usec;
 };
 
 #ifndef IP_ENTRY_H
 #define IP_ENTRY_H
-struct IP_entry {
+struct IP_entry 
+{
 	u_int count;	/* how many packets are received from this IP*/
 	struct IP_timestamp timestamps[50];		/* circular array contains the arrival time of last 50 packets from this IP */
 	u_char ts_index;	/* current index of timestamps circular array */
@@ -38,3 +57,5 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 void print_app_banner(void);
 
 void print_app_usage(void);
+
+#endif
