@@ -32,3 +32,9 @@ void ip_update (struct IP_entry **ip_list, u_char index, char* source_ip, long i
 
 /* deallocation of the memory spaces */
 void ip_free (struct IP_entry **ip_list);
+
+void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet);
+
+void print_app_banner(void);
+
+void print_app_usage(void);

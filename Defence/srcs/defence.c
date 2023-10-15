@@ -1,7 +1,3 @@
-#define APP_NAME		"TCP Syn Flood Defence"
-#define APP_DESC		"Read the TCP Syn and IPs"
-#define APP_COPYRIGHT	"No Copyright"
-#define APP_DISCLAIMER	"GoodBye Attackers"
 
 #include <pcap.h>
 #include <stdio.h>
@@ -20,54 +16,18 @@
 /* WARNING you can uncomment the printf functions for debug purpose
 	in the real time not uncomment them because when printing the system can miss some packets*/
 
-
-
 /*ip container structure definition*/
 struct IP_entry ** ip_list;
 
 /* table ronud for counting 1 minute for flushing the TCPIP_REJECTED chain*/
 static time_t table_round;
 
-
-void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet);
-
-void print_app_banner(void);
-
-void print_app_usage(void);
-
-/*
- * app name/banner
- */
-void print_app_banner(void) {
-
-	printf("%s - %s\n", APP_NAME, APP_DESC);
-	printf("%s\n", APP_COPYRIGHT);
-	printf("%s\n", APP_DISCLAIMER);
-	printf("\n");
-
-	return;
-}
-
-/*
- * print help text
- */
-void print_app_usage(void) {
-
-	printf("Usage: %s [interface]\n", APP_NAME);
-	printf("\n");
-	printf("Options:\n");
-	printf("    interface    Listen on <interface> for packets.\n");
-	printf("\n");
-
-	return;
-}
-
-
 /*
  * callback function for pcap_loop
  * captures the TCP/IP packets 
  */
-void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
+void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) 
+{
 
 	static int count = 1;                   /* packet counter */
 
@@ -152,7 +112,8 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	return;
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv) 
+{
 
 	/* flush the INPUT chain to prevent duplicate entries*/
 	system("iptables -F INPUT");
