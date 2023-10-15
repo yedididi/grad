@@ -1,20 +1,15 @@
-COMPILER = gcc
+CC = gcc
+SRCS = srcs/defence.c srcs/ip_container.c
+OUTS = srcs/defence.o srcs/ip_container.o
+INCS = incs
+TARGET = defence.out
 
-$(shell mkdir -p obj/)
+.c.o:
+	$(CC) -c -o $@ $< -I $(INCS)
 
-OUTS = obj/defence.o obj/ip_container.o
-TARGET = defence.exe
-
-all:$(OUTS)
-	$(COMPILER) -o $(TARGET) $(OUTS) -lpcap
-
-obj/defence.o:defence.c ip_container.h ip_headers.h
-	$(COMPILER) -c defence.c -o obj/defence.o
-
-obj/ip_container.o:ip_container.h
-	$(COMPILER) -c ip_container.c -o obj/ip_container.o
+all: $(OUTS)
+	$(CC) -o $(TARGET) $(OUTS) -lpcap
 
 clean:
-	rm -f obj/*.o
-	rmdir obj/
+	rm -f srcs/*.o
 	rm -f $(TARGET)

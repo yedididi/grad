@@ -14,8 +14,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <time.h>
-#include "ip_headers.h"
-#include "ip_container.h"
+#include "../incs/ip_headers.h"
+#include "../incs/ip_container.h"
 
 /* WARNING you can uncomment the printf functions for debug purpose
 	in the real time not uncomment them because when printing the system can miss some packets*/
