@@ -15,15 +15,15 @@
 
 struct pseudo_header    //needed for checksum calculation
 {
-    unsigned int source_address;
-    unsigned int dest_address;
-    unsigned char placeholder;
-    unsigned char protocol;
-    unsigned short tcp_length;
-    struct tcphdr tcp;
+    unsigned int    source_address;
+    unsigned int    dest_address;
+    unsigned char   placeholder;
+    unsigned char   protocol;
+    unsigned short  tcp_length;
+    struct tcphdr   tcp;
 };
 
-unsigned short  csum(unsigned short *ptr,int nbytes);
+unsigned short  csum(unsigned short *ptr, int nbytes);
 int             check_IP(char *IP);
 void            accept_info(FILE *interfaceFile, char *dIP, int *destPort);
 void            fill_struct(struct sockaddr_in sin, struct iphdr *iph, struct tcphdr *tcph, struct pseudo_header psh, int destPort, char *dIP, char *source_ip, char *datagram, int sourcePort);

@@ -21,7 +21,7 @@ int main(void)
     file = fopen("./SYN-Flood/IPNumbersCreated.txt", "w");
     interfaceFile = fopen("./SYN-Flood/interface.conf", "w");
     srand(time(NULL));	//Setting the seed for random creation.
-    accept_info(interfaceFile, dIP, &destPort);
+    accept_info(interfaceFile, dIP, &destPort); ///check if dIP is valid!!!!!!!!!!!!!!!!!
    
     while(1)
     {
@@ -33,7 +33,7 @@ int main(void)
         memset(datagram, 0, 4096);
         memset(source_ip, 0, 32);
         //Adding created integer to source host address.
-        int length = snprintf(NULL, 0, "%d", integerIP );
+        int length = snprintf(NULL, 0, "%d", integerIP);
         char* str = malloc(length + 1);
         snprintf(str, length + 1, "%d", integerIP);
         strcpy(source_ip , "10.20.50.");

