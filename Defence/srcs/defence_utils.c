@@ -3,12 +3,9 @@
 #define APP_COPYRIGHT	"No Copyright"
 #define APP_DISCLAIMER	"GoodBye Attackers"
 
-#include <stdio.h>
 #include "../incs/ip_container.h"
 
-/*
- * app name/banner
- */
+/* app name/banner */
 void print_app_banner(void) 
 {
 	printf("%s - %s\n", APP_NAME, APP_DESC);
@@ -19,9 +16,7 @@ void print_app_banner(void)
 	return;
 }
 
-/*
- * print help text
- */
+/* print help text */
 void print_app_usage(void) {
 
 	printf("Usage: %s [interface]\n", APP_NAME);

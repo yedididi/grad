@@ -1,6 +1,19 @@
-#include <stdlib.h>
-#include <sys/types.h>
+#ifndef IP_CONTAINER_H
+#define IP_CONTAINER_H
+
 #include <stdint.h>
+#include <pcap.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <time.h>
+#include <unistd.h>
 
 
 /* seconds and microseconds of the entry*/
@@ -38,3 +51,5 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 void print_app_banner(void);
 
 void print_app_usage(void);
+
+#endif
