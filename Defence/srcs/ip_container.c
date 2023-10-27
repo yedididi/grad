@@ -49,7 +49,7 @@ void ip_update(struct IP_entry **ip_list, u_char index, char* source_ip, long in
 			ip_list[index]->is_rejected = 1;
 		}
 		/* if can_drop is 1 since 60 seconds has passed and if the ip address already rejected then drop the IP address */
-		else if(can_drop && ip_list[index]->is_rejected == 1) 
+		else if (can_drop && ip_list[index]->is_rejected == 1)
 		{
 			/* make a systemcall for drop the IP address*/
 			char iptables_systemcall[90] = "iptables -t filter -A TCPIP_DROPPED -p tcp -s ";
