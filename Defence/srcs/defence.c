@@ -16,18 +16,17 @@ static time_t table_round;
  */
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) 
 {
-
 	static int count = 1;                   /* packet counter */
 
 	/* get the time of first packet */
-	if (count == 1) 
+	if (count == 1)
 	{
 		time(&table_round);
 	}
 
 	// boolean value for start dropping (0 not drop, 1 drop)
 	static char ip_can_drop = 0;
-	
+
 	/* declare pointers to packet headers */
 	const struct ethernet_header *ethernet;  /* The ethernet header [1] */
 	const struct ip_header *ip;              /* The IP header */
@@ -37,8 +36,8 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	int size_tcp;
 
 	/* if 1 minutes pass from (current packet time - first packet time) and ip_can_drop == 0 
-		flush the TCPIP_REJECTED and set ip_can_drop 1*/
-	if ( (header->ts.tv_sec - table_round) >= 60 && !ip_can_drop ) 
+		flush the TCPIP_REJECTED and set ip_can_drop to 1*/
+	if ((header->ts.tv_sec - table_round) >= 60 && !ip_can_drop)
 	{
 		system("iptables -F TCPIP_REJECTED");
 		ip_can_drop = 1;
@@ -46,10 +45,10 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	
 	/* define ethernet header */
 	ethernet = (struct ethernet_header*)(packet);
-	
+
 	/* define/compute ip header offset */
 	ip = (struct ip_header*)(packet + SIZE_ETHERNET);
-	size_ip = IP_HL(ip)*4;
+	size_ip = IP_HL(ip) * 4;
 	if (size_ip < 20) 
 	{
 		printf("   * Invalid IP header length: %u bytes\n", size_ip);
@@ -57,13 +56,13 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	}
 
 	/* Altough filter just bring TCP check one more time for TCP */
-	if (ip->ip_p != IPPROTO_TCP)	
+	if (ip->ip_p != IPPROTO_TCP)
 		return;
 
 	/*get the last octet of the host ip with token*/
 	char ipsrc_tmp[16];
 	strcpy(ipsrc_tmp, inet_ntoa(ip->ip_src));
-	char* token = strtok(ipsrc_tmp, ".");
+	char *token = strtok(ipsrc_tmp, ".");
 	u_char c = 0;
 	while (token) 
 	{

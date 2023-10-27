@@ -2,8 +2,8 @@
 // Created by Boran Yildirim on 13/07/2017.
 //
 
-#ifndef VLAN_HOPPING_IP_HEADERS_H
-#define VLAN_HOPPING_IP_HEADERS_H
+#ifndef IP_HEADERS_H
+#define IP_HEADERS_H
 
 #include <stdlib.h>
 #include <netinet/in.h>
