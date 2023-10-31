@@ -1,11 +1,13 @@
 #include "../incs/ip_headers.h"
 #include "../incs/ip_container.h"
+#include "../incs/list.h"
 
 /* WARNING you can uncomment the printf functions for debug purpose
 	in the real time not uncomment them because when printing the system can miss some packets*/
 
 /*ip container structure definition*/
-struct IP_entry **ip_list;
+// struct IP_entry **ip_list;
+t_ip_node head_ip;
 
 /* table ronud for counting 1 minute for flushing the TCPIP_REJECTED chain*/
 static time_t table_round;
@@ -18,12 +20,6 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 {
 	static int count = 1;                   /* packet counter */
 
-	/* get the time of first packet */
-	if (count == 1)
-	{
-		time(&table_round);
-	}
-
 	// boolean value for start dropping (0 not drop, 1 drop)
 	static char ip_can_drop = 0;
 
@@ -34,6 +30,12 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 
 	int size_ip;
 	int size_tcp;
+
+	/* get the time of first packet */
+	if (count == 1)
+	{
+		time(&table_round);
+	}
 
 	/* if 1 minutes pass from (current packet time - first packet time) and ip_can_drop == 0 
 		flush the TCPIP_REJECTED and set ip_can_drop to 1*/
@@ -63,19 +65,20 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	char ipsrc_tmp[16];
 	strcpy(ipsrc_tmp, inet_ntoa(ip->ip_src));
 	char *token = strtok(ipsrc_tmp, ".");
-	u_char c = 0;
-	while (token) 
-	{
-		/* if last octet is reached*/
-		if (c == 3) 
-		{
-			/* index of entry array is host IP number (hash with host IP)*/
-			u_char index = atoi(token);
-			ip_update(ip_list, index, inet_ntoa(ip->ip_src), header->ts.tv_sec, header->ts.tv_usec, ip_can_drop);
-		}
-		token = strtok(NULL, ".");
-    	c++;
-	}
+	ip_update(head_ip, token, inet_ntoa(ip->ip_src), header->ts.tv_sec, header->ts.tv_usec, ip_can_drop);
+	// u_char c = 0;
+	// while (token) 
+	// {
+	// 	/* if last octet is reached*/
+	// 	if (c == 3) 
+	// 	{
+	// 		/* index of entry array is host IP number (hash with host IP)*/
+	// 		u_char index = atoi(token);
+	// 		ip_update(ip_list, index, inet_ntoa(ip->ip_src), header->ts.tv_sec, header->ts.tv_usec, ip_can_drop);
+	// 	}
+	// 	token = strtok(NULL, ".");
+    // 	c++;
+	// }
 	
 	//printf("   Protocol: TCP\n");
 
@@ -106,6 +109,16 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 
 int main(int argc, char **argv) 
 {
+	char *dev = NULL;			/* capture device name */
+	char errbuf[PCAP_ERRBUF_SIZE];		/* error buffer */
+	pcap_t *handle;				/* packet capture handle */
+
+	char filter_exp[] = "dst host 10.20.40.31 and port 8080 and ip and (tcp[tcpflags] & (tcp-syn) != 0)";		/* filter expression for pcap compile */
+	struct bpf_program fp;			/* compiled filter program (expression) */
+	bpf_u_int32 mask;			/* subnet mask */
+	bpf_u_int32 net;			/* ip */
+	int num_packets = 0;			/* number of packets to capture */
+
 	/* flush the INPUT chain to prevent duplicate entries*/
 	system("iptables -F INPUT");
 
@@ -124,18 +137,8 @@ int main(int argc, char **argv)
 	system("iptables -F TCPIP_REJECTED");
 	system("iptables -F TCPIP_DROPPED");
 
-	char *dev = NULL;			/* capture device name */
-	char errbuf[PCAP_ERRBUF_SIZE];		/* error buffer */
-	pcap_t *handle;				/* packet capture handle */
-
-	char filter_exp[] = "dst host 10.20.40.31 and port 8080 and ip and (tcp[tcpflags] & (tcp-syn) != 0)";		/* filter expression for pcap compile */
-	struct bpf_program fp;			/* compiled filter program (expression) */
-	bpf_u_int32 mask;			/* subnet mask */
-	bpf_u_int32 net;			/* ip */
-	int num_packets = 0;			/* number of packets to capture */
-
-	ip_list = ip_init();	/* ip list initialization*/
-
+	// ip_list = ip_init();	/* ip list initialization*/
+	init_ip_list(&head_ip);
 	print_app_banner();
 
 	/* find a capture device */
@@ -188,14 +191,13 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-
 	/* now we can set our callback function */
 	pcap_loop(handle, num_packets, got_packet, NULL);
 
 	/* cleanup */
 	pcap_freecode(&fp);
 	pcap_close(handle);
-	ip_free(ip_list);
+	ip_free(head_ip);
 
 	printf("\nCapture complete.\n");
 

@@ -1,43 +1,46 @@
 #include "../incs/ip_container.h"
+#include "../incs/list.h"
 
-struct IP_entry **ip_init(void) 
-{
-	/* Entry 0 will not be used*/
-	struct IP_entry **ip_tmp = calloc(IP_ARR_SIZE + 1, sizeof(struct IP_entry));
+// struct IP_entry **ip_init(void) 
+// {
+// 	/* Entry 0 will not be used*/
+// 	struct IP_entry **ip_tmp = calloc(IP_ARR_SIZE + 1, sizeof(struct IP_entry));
 
-	/* initialization of IP_entry array with default 0 values*/
-	for (int i = 1; i <= IP_ARR_SIZE; ++i)
-	{
-		ip_tmp[i] = malloc(sizeof(struct IP_entry));
-		ip_tmp[i]->count = 0;
-		ip_tmp[i]->ts_index = 0;
-		ip_tmp[i]->is_rejected = 0;
-	}
+// 	/* initialization of IP_entry array with default 0 values*/
+// 	for (int i = 1; i <= IP_ARR_SIZE; ++i)
+// 	{
+// 		ip_tmp[i] = malloc(sizeof(struct IP_entry));
+// 		ip_tmp[i]->count = 0;
+// 		ip_tmp[i]->ts_index = 0;
+// 		ip_tmp[i]->is_rejected = 0;
+// 	}
 
-	return (ip_tmp);
-}
+// 	return (ip_tmp);
+// }
 
-void ip_update(struct IP_entry **ip_list, u_char index, char* source_ip, long int sec, long int usec, char can_drop) 
+void ip_update(t_ip_node *head_ip, u_char ip_address, char* source_ip, long int sec, long int usec, char can_drop) 
 {
 	/* increment the packet counter of specific entry*/
-	ip_list[index]->count++;
+	t_ip_node	*attack_node;
+	attack_node = search_ipnode(ip_address, head_ip);
+	attack_node->count++;
 
 	/* current index of timestamps array*/
-	u_char curr_index = ip_list[index]->ts_index;
+	u_char curr_index = attack_node->ts_index;
 
 	/* current timestamp of timestamps array */
-	struct IP_timestamp *curr = &(ip_list[index]->timestamps[curr_index]);
+	struct IP_timestamp *curr = &(attack_node->timestamps[curr_index]);
 	curr->sec = sec;
 	curr->usec = usec;
 
 	/* next index timestamp of current timestamp*/
-	struct IP_timestamp next = ip_list[index]->timestamps[(curr_index + 1) % 50];
+	struct IP_timestamp next = attack_node->timestamps[(curr_index + 1) % 50];
 
 	/*This checks count > 50 and time difference < 3*/
 	if ((curr->sec - next.sec) < 3)
 	{
 		/* if ip address is not rejected before then reject the IP address*/
-		if (ip_list[index]->is_rejected == 0)
+		if (attack_node->is_rejected == 0)
 		{
 			/* make a system call for reject the IP address with TCP-RST*/
 			char iptables_systemcall[100] = "iptables -t filter -A TCPIP_REJECTED -p tcp -s ";
@@ -46,10 +49,10 @@ void ip_update(struct IP_entry **ip_list, u_char index, char* source_ip, long in
 			system(iptables_systemcall);
 
 			/* ip address is rejected*/
-			ip_list[index]->is_rejected = 1;
+			attack_node->is_rejected = 1;
 		}
 		/* if can_drop is 1 since 60 seconds has passed and if the ip address already rejected then drop the IP address */
-		else if (can_drop && ip_list[index]->is_rejected == 1)
+		else if (can_drop && attack_node->is_rejected == 1)
 		{
 			/* make a systemcall for drop the IP address*/
 			char iptables_systemcall[90] = "iptables -t filter -A TCPIP_DROPPED -p tcp -s ";
@@ -58,23 +61,23 @@ void ip_update(struct IP_entry **ip_list, u_char index, char* source_ip, long in
 			system(iptables_systemcall);
 
 			/* ip address is dropped*/
-			ip_list[index]->is_rejected = 2;
+			attack_node->is_rejected = 2;
 		}
 	}
 	/* increment the index and get the modulo 50 */
-	(ip_list[index]->ts_index)++;
-	(ip_list[index]->ts_index) %= 50;
+	(attack_node->ts_index)++;
+	(attack_node->ts_index) %= 50;
 }
 
 /* clear the IP list */
-void ip_free(struct IP_entry **ip_list) 
+void ip_free(t_ip_node *head_ip) 
 {
-	if (ip_list) 
+	t_ip_node *node;
+
+	node = head_ip;
+	if (node) 
 	{
-		for (int i = 0; i < IP_ARR_SIZE; ++i) 
-		{
-			free(ip_list[i]);
-		}
-		free(ip_list);
+		free_ipnode(node);
+		node = node->next_node;
 	}
 }
