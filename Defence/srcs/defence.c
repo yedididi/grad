@@ -7,7 +7,7 @@
 
 /*ip container structure definition*/
 // struct IP_entry **ip_list;
-t_ip_node head_ip;
+t_ip_node *head_ip;
 
 /* table ronud for counting 1 minute for flushing the TCPIP_REJECTED chain*/
 static time_t table_round;
@@ -138,7 +138,7 @@ int main(int argc, char **argv)
 	system("iptables -F TCPIP_DROPPED");
 
 	// ip_list = ip_init();	/* ip list initialization*/
-	init_ip_list(&head_ip);
+	init_ip_list(head_ip);
 	print_app_banner();
 
 	/* find a capture device */

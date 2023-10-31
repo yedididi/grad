@@ -31,7 +31,7 @@ void	add_new_ipnode(char *ip_address, t_ip_node *head_ip)
 	t_ip_node	*newnode;
 	t_ip_node	*before_tail_node;
 
-	newnode = create_new_envnode(ip_address);
+	newnode = create_new_ipnode(ip_address);
 	newnode->next_node = NULL;
 	before_tail_node = head_ip;
 	while (1)
@@ -59,7 +59,7 @@ t_ip_node	*search_ipnode(char *ip_address, t_ip_node *head_ip)
 	node = head_ip;
 	while (node)
 	{
-		if (strncmp(ip_address, node->ip_address, ft_strlen(ip_address)) == 0)
+		if (strncmp(ip_address, node->ip_address, strlen(ip_address)) == 0)
 			return (node);
 		node = node->next_node;
 	}
@@ -77,13 +77,13 @@ void	delete_node(t_ip_node *env_head, char *ip_address)
 	prev_node = NULL;
 	while (node)
 	{
-		if (ft_strncmp(ip_address, node->ip_address, ft_strlen(node->ip_address)) == 0)
+		if (strncmp(ip_address, node->ip_address, strlen(node->ip_address)) == 0)
 		{
 			if (prev_node == NULL)
 				real_head->next_node = node->next_node;
 			else
 				prev_node->next_node = node->next_node;
-			free_envnode(node);
+			free_ipnode(node);
 			return ;
 		}
 		prev_node = node;

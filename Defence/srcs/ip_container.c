@@ -18,7 +18,7 @@
 // 	return (ip_tmp);
 // }
 
-void ip_update(t_ip_node *head_ip, u_char ip_address, char* source_ip, long int sec, long int usec, char can_drop) 
+void ip_update(t_ip_node *head_ip, char *ip_address, char* source_ip, long int sec, long int usec, char can_drop) 
 {
 	/* increment the packet counter of specific entry*/
 	t_ip_node	*attack_node;

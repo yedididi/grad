@@ -2,6 +2,7 @@
 #define LIST_H
 
 #include <string.h>
+#include <stdlib.h>
 
 /* seconds and microseconds of the entry*/
 struct IP_timestamp {
@@ -25,5 +26,10 @@ void	    add_new_ipnode(char *ip_address, t_ip_node *head_ip);
 void	    free_ipnode(t_ip_node *node);
 t_ip_node	*search_ipnode(char *ip_address, t_ip_node *head_ip);
 void	    delete_node(t_ip_node *env_head, char *ip_address);
+/* update the entry values  in the specific index*/
+void ip_update(t_ip_node *head_ip, char *ip_address, char* source_ip, long int sec, long int usec, char can_drop);
+
+/* deallocation of the memory spaces */
+void ip_free(t_ip_node *head_ip);
 
 #endif

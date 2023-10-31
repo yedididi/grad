@@ -40,11 +40,11 @@ struct IP_entry** ip_init ();
 /* Reset the ip_entry */
 void ip_reset (struct IP_entry **ip_list, u_char index);
 
-/* update the entry values  in the specific index*/
-void ip_update(t_ip_node *head_ip, u_char ip_address, char* source_ip, long int sec, long int usec, char can_drop);
+// /* update the entry values  in the specific index*/
+// void ip_update(t_ip_node *head_ip, u_char ip_address, char* source_ip, long int sec, long int usec, char can_drop);
 
-/* deallocation of the memory spaces */
-void ip_free(t_ip_node *head_ip);
+// /* deallocation of the memory spaces */
+// void ip_free(t_ip_node *head_ip);
 
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet);
 
