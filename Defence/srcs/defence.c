@@ -7,7 +7,7 @@
 
 /*ip container structure definition*/
 // struct IP_entry **ip_list;
-t_ip_node *head_ip;
+// t_ip_node *head_ip;
 
 /* table ronud for counting 1 minute for flushing the TCPIP_REJECTED chain*/
 static time_t table_round;
@@ -66,19 +66,6 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	strcpy(ipsrc_tmp, inet_ntoa(ip->ip_src));
 	char *token = strtok(ipsrc_tmp, ".");
 	ip_update(head_ip, token, inet_ntoa(ip->ip_src), header->ts.tv_sec, header->ts.tv_usec, ip_can_drop);
-	// u_char c = 0;
-	// while (token) 
-	// {
-	// 	/* if last octet is reached*/
-	// 	if (c == 3) 
-	// 	{
-	// 		/* index of entry array is host IP number (hash with host IP)*/
-	// 		u_char index = atoi(token);
-	// 		ip_update(ip_list, index, inet_ntoa(ip->ip_src), header->ts.tv_sec, header->ts.tv_usec, ip_can_drop);
-	// 	}
-	// 	token = strtok(NULL, ".");
-    // 	c++;
-	// }
 	
 	//printf("   Protocol: TCP\n");
 
@@ -92,7 +79,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	/* define/compute tcp header offset */
 	tcp = (struct tcp_header*)(packet + SIZE_ETHERNET + size_ip);
 	size_tcp = TH_OFF(tcp) * 4;
-	if (size_tcp < 20) 
+	if (size_tcp < 20)
 	{
 		printf("   * Invalid TCP header length: %u bytes\n", size_tcp);
 		return;
@@ -112,12 +99,12 @@ int main(int argc, char **argv)
 	char *dev = NULL;			/* capture device name */
 	char errbuf[PCAP_ERRBUF_SIZE];		/* error buffer */
 	pcap_t *handle;				/* packet capture handle */
-
 	char filter_exp[] = "dst host 10.20.40.31 and port 8080 and ip and (tcp[tcpflags] & (tcp-syn) != 0)";		/* filter expression for pcap compile */
 	struct bpf_program fp;			/* compiled filter program (expression) */
 	bpf_u_int32 mask;			/* subnet mask */
 	bpf_u_int32 net;			/* ip */
 	int num_packets = 0;			/* number of packets to capture */
+	pthread_t monitoring_t;
 
 	/* flush the INPUT chain to prevent duplicate entries*/
 	system("iptables -F INPUT");
@@ -191,10 +178,12 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
+	pthread_create(monitoring_t, NULL, monitor, handle);
 	/* now we can set our callback function */
 	pcap_loop(handle, num_packets, got_packet, NULL);
 
 	/* cleanup */
+	end_thread(monitoring_t, head_ip);
 	pcap_freecode(&fp);
 	pcap_close(handle);
 	ip_free(head_ip);

@@ -1,4 +1,5 @@
 #include "../incs/list.h"
+#include "../incs/ip_container.h"
 
 void	init_ip_list(t_ip_node *head_ip)
 {
@@ -9,10 +10,12 @@ void	init_ip_list(t_ip_node *head_ip)
     head_ip->ip_address = 0;
 	head_ip->ts_index = 0;
 	head_ip->is_rejected = 0;
+	if (pthread_mutex_init(&(head_ip->ip_mutex), NULL) != 0)
+		return (-1);
     head_ip->next_node = 0;
 }
 
-t_ip_node	*create_new_ipnode(char *ip_address)
+t_ip_node	*create_new_ipnode(char *ip_address, pthread_mutex_t ip_mutex)
 {
 	t_ip_node	*newnode;
 
@@ -23,6 +26,7 @@ t_ip_node	*create_new_ipnode(char *ip_address)
     newnode->ip_address = ip_address;
 	newnode->ts_index = 0;
 	newnode->is_rejected = 0;
+	newnode->ip_mutex = ip_mutex;
 	return (newnode);
 }
 
@@ -31,7 +35,7 @@ void	add_new_ipnode(char *ip_address, t_ip_node *head_ip)
 	t_ip_node	*newnode;
 	t_ip_node	*before_tail_node;
 
-	newnode = create_new_ipnode(ip_address);
+	newnode = create_new_ipnode(ip_address, head_ip->ip_mutex);
 	newnode->next_node = NULL;
 	before_tail_node = head_ip;
 	while (1)

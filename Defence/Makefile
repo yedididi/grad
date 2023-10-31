@@ -1,6 +1,6 @@
 CC = gcc
-SRCS = srcs/defence.c srcs/defence_utils.c srcs/ip_container.c srcs/list.c
-OUTS = srcs/defence.o srcs/defence_utils.o srcs/ip_container.o srcs/list.o
+SRCS = srcs/defence.c srcs/defence_utils.c srcs/ip_container.c srcs/list.c srcs/monitoring.c
+OUTS = srcs/defence.o srcs/defence_utils.o srcs/ip_container.o srcs/list.o srcs/monitoring.c
 INCS = incs
 TARGET = defence.out
 

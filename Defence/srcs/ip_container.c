@@ -1,23 +1,6 @@
 #include "../incs/ip_container.h"
 #include "../incs/list.h"
 
-// struct IP_entry **ip_init(void) 
-// {
-// 	/* Entry 0 will not be used*/
-// 	struct IP_entry **ip_tmp = calloc(IP_ARR_SIZE + 1, sizeof(struct IP_entry));
-
-// 	/* initialization of IP_entry array with default 0 values*/
-// 	for (int i = 1; i <= IP_ARR_SIZE; ++i)
-// 	{
-// 		ip_tmp[i] = malloc(sizeof(struct IP_entry));
-// 		ip_tmp[i]->count = 0;
-// 		ip_tmp[i]->ts_index = 0;
-// 		ip_tmp[i]->is_rejected = 0;
-// 	}
-
-// 	return (ip_tmp);
-// }
-
 void ip_update(t_ip_node *head_ip, char *ip_address, char* source_ip, long int sec, long int usec, char can_drop) 
 {
 	/* increment the packet counter of specific entry*/

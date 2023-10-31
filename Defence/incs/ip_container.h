@@ -14,6 +14,7 @@
 #include <arpa/inet.h>
 #include <time.h>
 #include <unistd.h>
+#include <pthread.h>
 
 
 // /* seconds and microseconds of the entry*/
@@ -34,6 +35,8 @@
 
 #define IP_ARR_SIZE 254	/* 254 host ip 10.20.40.* (0 and 255 excluded)*/ 
 
+t_ip_node *head_ip;
+
 /* create new IP_entry in ip_list */
 struct IP_entry** ip_init ();
 
@@ -51,5 +54,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 void print_app_banner(void);
 
 void print_app_usage(void);
+
+void    *monitor(void *argv);
 
 #endif
