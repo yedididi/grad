@@ -15,7 +15,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <pthread.h>
-
+#include "list.h"
 
 // /* seconds and microseconds of the entry*/
 // struct IP_timestamp {
@@ -35,13 +35,13 @@
 
 #define IP_ARR_SIZE 254	/* 254 host ip 10.20.40.* (0 and 255 excluded)*/ 
 
-t_ip_node *head_ip;
-
 /* create new IP_entry in ip_list */
 struct IP_entry** ip_init ();
 
 /* Reset the ip_entry */
 void ip_reset (struct IP_entry **ip_list, u_char index);
+
+// t_ip_node *head_ip;
 
 // /* update the entry values  in the specific index*/
 // void ip_update(t_ip_node *head_ip, u_char ip_address, char* source_ip, long int sec, long int usec, char can_drop);
@@ -56,5 +56,7 @@ void print_app_banner(void);
 void print_app_usage(void);
 
 void    *monitor(void *argv);
+void    update_ll(u_char *args, const struct pcap_pkthdr *header, const u_char *packet);
+void    end_thread(pthread_t monitoring_t, t_ip_node *head_ip);
 
 #endif

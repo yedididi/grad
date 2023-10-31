@@ -11,7 +11,7 @@ void	init_ip_list(t_ip_node *head_ip)
 	head_ip->ts_index = 0;
 	head_ip->is_rejected = 0;
 	if (pthread_mutex_init(&(head_ip->ip_mutex), NULL) != 0)
-		return (-1);
+		exit(1);
     head_ip->next_node = 0;
 }
 

@@ -6,7 +6,10 @@ void ip_update(t_ip_node *head_ip, char *ip_address, char* source_ip, long int s
 	/* increment the packet counter of specific entry*/
 	t_ip_node	*attack_node;
 	attack_node = search_ipnode(ip_address, head_ip);
+	if (attack_node == NULL)
+		add_new_ipnode(ip_address, head_ip);
 	attack_node->count++;
+	time(&(attack_node->last_attack_time));
 
 	/* current index of timestamps array*/
 	u_char curr_index = attack_node->ts_index;

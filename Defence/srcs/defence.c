@@ -7,7 +7,7 @@
 
 /*ip container structure definition*/
 // struct IP_entry **ip_list;
-// t_ip_node *head_ip;
+t_ip_node *head_ip;
 
 /* table ronud for counting 1 minute for flushing the TCPIP_REJECTED chain*/
 static time_t table_round;
@@ -94,6 +94,26 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	return;
 }
 
+void    update_ll(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
+{
+    t_ip_node   *node;
+    t_ip_node   *next_node;
+    time_t      after_min;
+    
+    sleep(60);
+    time(&after_min);
+    node = head_ip;
+    pthread_mutex_lock(&(head_ip->ip_mutex));
+    while (node)
+    {
+        next_node = node->next_node;
+        if (after_min - node->last_attack_time > 60)
+            delete_node(head_ip, node->ip_address);
+        node = next_node;
+    }
+    pthread_mutex_unlock(&(head_ip->ip_mutex));
+}
+
 int main(int argc, char **argv) 
 {
 	char *dev = NULL;			/* capture device name */
@@ -178,7 +198,7 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	pthread_create(monitoring_t, NULL, monitor, handle);
+	pthread_create(&(monitoring_t), NULL, monitor, handle);
 	/* now we can set our callback function */
 	pcap_loop(handle, num_packets, got_packet, NULL);
 
